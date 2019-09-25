@@ -10,6 +10,8 @@ const (
 	ErrEmptyKey = errors.Error("invalid key, cannot be empty")
 	// ErrEmptyName is returned when an empty name is provided
 	ErrEmptyName = errors.Error("invalid name, cannot be empty")
+	// ErrEmptyTemplate is returned when an empty template is provided
+	ErrEmptyTemplate = errors.Error("invalid template, cannot be empty")
 	// ErrPageWithNameExists is returned when a page name is used and already exists
 	ErrPageWithNameExists = errors.Error("cannot create a page with the provided name, one already exists")
 )
@@ -68,13 +70,26 @@ func (p *Pages) new(txn *core.Transaction, e *Entry) (err error) {
 	return
 }
 
-func (p *Pages) edit(txn *core.Transaction, key string, d Data) (err error) {
+func (p *Pages) editData(txn *core.Transaction, key string, d Data) (err error) {
 	var latest *Entry
 	if latest, err = p.getByKey(txn, key); err != nil {
 		return
 	}
 
-	e := newEntry(latest.Name, latest.Key, d)
+	e := newEntry(latest.Name, latest.Key, latest.Template, d)
+
+	// Create a new entry using the provided
+	_, err = txn.New(&e)
+	return
+}
+
+func (p *Pages) editTemplate(txn *core.Transaction, key, template string) (err error) {
+	var latest *Entry
+	if latest, err = p.getByKey(txn, key); err != nil {
+		return
+	}
+
+	e := newEntry(latest.Name, latest.Key, template, latest.Data)
 
 	// Create a new entry using the provided
 	_, err = txn.New(&e)
@@ -98,8 +113,8 @@ func (p *Pages) remove(txn *core.Transaction, key string) (err error) {
 }
 
 // New will insert a new page with a given page name
-func (p *Pages) New(pagename string, d Data) (key string, err error) {
-	e := newEntry(pagename, santizeName(pagename), d)
+func (p *Pages) New(pagename, template string, d Data) (key string, err error) {
+	e := newEntry(pagename, santizeName(pagename), template, d)
 	if err = e.Validate(); err != nil {
 		return
 	}
@@ -134,10 +149,19 @@ func (p *Pages) GetAll(key string) (es []*Entry, err error) {
 	return
 }
 
-// Edit will update an existing page with a given key
-func (p *Pages) Edit(key string, d Data) (err error) {
+// EditData will update the data for an existing page
+func (p *Pages) EditData(key string, d Data) (err error) {
 	err = p.c.Transaction(func(txn *core.Transaction) (err error) {
-		return p.edit(txn, key, d)
+		return p.editData(txn, key, d)
+	})
+
+	return
+}
+
+// EditTemplate will update the template for an existing page
+func (p *Pages) EditTemplate(key, template string) (err error) {
+	err = p.c.Transaction(func(txn *core.Transaction) (err error) {
+		return p.editTemplate(txn, key, template)
 	})
 
 	return

@@ -10,16 +10,20 @@ func TestEntry_Validate(t *testing.T) {
 
 	tcs := []tc{
 		{
-			e:   newEntry("test_name", "test-name", nil),
+			e:   newEntry("test_name", "test-name", "test-template", nil),
 			err: nil,
 		},
 		{
-			e:   newEntry("", "test-name", nil),
+			e:   newEntry("", "test-name", "test-template", nil),
 			err: ErrEmptyName,
 		},
 		{
-			e:   newEntry("test_name", "", nil),
+			e:   newEntry("test_name", "", "test-template", nil),
 			err: ErrEmptyKey,
+		},
+		{
+			e:   newEntry("test_name", "test-name", "", nil),
+			err: ErrEmptyTemplate,
 		},
 	}
 

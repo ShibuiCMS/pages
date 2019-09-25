@@ -35,14 +35,16 @@ func TestPages_New(t *testing.T) {
 	defer testTeardown(p, nil)
 
 	type tc struct {
-		name string
-		err  error
+		name     string
+		template string
+		err      error
 	}
 
 	tcs := []tc{
 		{
-			name: "test page name",
-			err:  nil,
+			name:     "test page name",
+			template: "template-1",
+			err:      nil,
 		},
 		{
 			name: "",
@@ -55,7 +57,7 @@ func TestPages_New(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		if _, err = p.New(tc.name, Data{"foo": "bar"}); err != tc.err {
+		if _, err = p.New(tc.name, tc.template, Data{"foo": "bar"}); err != tc.err {
 			t.Fatalf("invalid error, expected %v and received %v", tc.err, err)
 		}
 	}
@@ -73,36 +75,41 @@ func TestPages_Get(t *testing.T) {
 	defer testTeardown(p, nil)
 
 	type tc struct {
-		name string
-		key  string
-		data Data
-		err  error
+		name     string
+		key      string
+		template string
+		data     Data
+		err      error
 	}
 
 	tcs := []tc{
 		{
-			name: "test page name",
-			key:  "test-page-name",
-			data: Data{"foo": "bar"},
-			err:  nil,
+			name:     "test page name",
+			key:      "test-page-name",
+			template: "template-1",
+			data:     Data{"foo": "bar"},
+			err:      nil,
 		},
 		{
-			name: "test page name 2",
-			key:  "test-page-name-2",
-			data: Data{"foo": "bar 2"},
-			err:  nil,
+			name:     "test page name 2",
+			key:      "test-page-name-2",
+			template: "template-2",
+			data:     Data{"foo": "bar 2"},
+			err:      nil,
 		},
 		{
-			name: "test page name 3",
-			key:  "test-page-name-3",
-			data: Data{"foo": "bar 3"},
-			err:  nil,
+			name:     "test page name 3",
+			key:      "test-page-name-3",
+			template: "template-3",
+			data:     Data{"foo": "bar 3"},
+			err:      nil,
 		},
 		{
-			name: "test page name 4",
-			key:  "test-page-name-4",
-			data: Data{"foo": "bar 4"},
-			err:  nil,
+			name:     "test page name 4",
+			key:      "test-page-name-4",
+			template: "template-4",
+			data:     Data{"foo": "bar 4"},
+			err:      nil,
 		},
 		{
 			name: "",
@@ -115,7 +122,7 @@ func TestPages_Get(t *testing.T) {
 	for _, tc := range tcs {
 		if tc.name != "" {
 			var key string
-			if key, err = p.New(tc.name, tc.data); err != nil {
+			if key, err = p.New(tc.name, tc.template, tc.data); err != nil {
 				t.Fatal(err)
 			}
 
@@ -131,6 +138,10 @@ func TestPages_Get(t *testing.T) {
 
 		if e == nil {
 			continue
+		}
+
+		if e.Template != tc.template {
+			t.Fatalf("invalid template, expected \"%s\" and received \"%s\"", tc.template, e.Template)
 		}
 
 		if e.Data["foo"] != tc.data["foo"] {
@@ -151,34 +162,37 @@ func TestPages_GetAll(t *testing.T) {
 	defer testTeardown(p, nil)
 
 	type tc struct {
-		name    string
-		data    Data
-		newData Data
-		err     error
+		name     string
+		template string
+		data     Data
+		newData  Data
+		err      error
 	}
 
 	tcs := []tc{
 		{
-			name:    "test page name",
-			data:    Data{"foo": "bar"},
-			newData: Data{"foo": "baz"},
-			err:     nil,
+			name:     "test page name",
+			template: "template-1",
+			data:     Data{"foo": "bar"},
+			newData:  Data{"foo": "baz"},
+			err:      nil,
 		},
 		{
-			name:    "another test page name",
-			data:    Data{"one": "two"},
-			newData: Data{"three": "four"},
-			err:     nil,
+			name:     "another test page name",
+			template: "template-2",
+			data:     Data{"one": "two"},
+			newData:  Data{"three": "four"},
+			err:      nil,
 		},
 	}
 
 	for _, tc := range tcs {
 		var key string
-		if key, err = p.New(tc.name, tc.data); err != tc.err {
+		if key, err = p.New(tc.name, tc.template, tc.data); err != tc.err {
 			t.Fatalf("invalid error, expected %v and received %v", tc.err, err)
 		}
 
-		if err = p.Edit(key, tc.newData); err != nil {
+		if err = p.EditData(key, tc.newData); err != nil {
 			t.Fatalf("error editing \"%s\": %v", key, err)
 		}
 
@@ -193,15 +207,19 @@ func TestPages_GetAll(t *testing.T) {
 
 		if e := es[0]; e.Data["foo"] != tc.data["foo"] {
 			t.Fatalf("invalid value for data[%s], expected \"%s\" and received \"%s\"", "foo", tc.data["foo"], e.Data["foo"])
+		} else if e.Template != tc.template {
+			t.Fatalf("invalid template, expected \"%s\" and received \"%s\"", tc.template, e.Template)
 		}
 
 		if e := es[1]; e.Data["foo"] != tc.newData["foo"] {
 			t.Fatalf("invalid value for data[%s], expected \"%s\" and received \"%s\"", "foo", tc.newData["foo"], e.Data["foo"])
+		} else if e.Template != tc.template {
+			t.Fatalf("invalid template, expected \"%s\" and received \"%s\"", tc.template, e.Template)
 		}
 	}
 }
 
-func TestPages_Edit(t *testing.T) {
+func TestPages_EditData(t *testing.T) {
 	var (
 		p   *Pages
 		err error
@@ -213,28 +231,30 @@ func TestPages_Edit(t *testing.T) {
 	defer testTeardown(p, nil)
 
 	type tc struct {
-		name    string
-		data    Data
-		newData Data
-		err     error
+		name     string
+		template string
+		data     Data
+		newData  Data
+		err      error
 	}
 
 	tcs := []tc{
 		{
-			name:    "test page name",
-			data:    Data{"foo": "bar"},
-			newData: Data{"foo": "baz"},
-			err:     nil,
+			name:     "test page name",
+			template: "template-1",
+			data:     Data{"foo": "bar"},
+			newData:  Data{"foo": "baz"},
+			err:      nil,
 		},
 	}
 
 	for _, tc := range tcs {
 		var key string
-		if key, err = p.New(tc.name, tc.data); err != tc.err {
+		if key, err = p.New(tc.name, tc.template, tc.data); err != tc.err {
 			t.Fatalf("invalid error, expected %v and received %v", tc.err, err)
 		}
 
-		if err = p.Edit(key, tc.newData); err != nil {
+		if err = p.EditData(key, tc.newData); err != nil {
 			t.Fatalf("error editing \"%s\": %v", key, err)
 		}
 
@@ -245,6 +265,56 @@ func TestPages_Edit(t *testing.T) {
 
 		if e.Data["foo"] != tc.newData["foo"] {
 			t.Fatalf("invalid value for data[%s], expected \"%s\" and received \"%s\"", "foo", tc.newData["foo"], e.Data["foo"])
+		}
+	}
+}
+
+func TestPages_EditTemplate(t *testing.T) {
+	var (
+		p   *Pages
+		err error
+	)
+
+	if p, err = testInit(); err != nil {
+		t.Fatal(err)
+	}
+	defer testTeardown(p, nil)
+
+	type tc struct {
+		name        string
+		template    string
+		newTemplate string
+		data        Data
+		err         error
+	}
+
+	tcs := []tc{
+		{
+			name:        "test page name",
+			template:    "template-1",
+			newTemplate: "template-2",
+			data:        Data{"foo": "bar"},
+			err:         nil,
+		},
+	}
+
+	for _, tc := range tcs {
+		var key string
+		if key, err = p.New(tc.name, tc.template, tc.data); err != tc.err {
+			t.Fatalf("invalid error, expected %v and received %v", tc.err, err)
+		}
+
+		if err = p.EditTemplate(key, tc.newTemplate); err != nil {
+			t.Fatalf("error editing \"%s\": %v", key, err)
+		}
+
+		var e *Entry
+		if e, err = p.Get(key); err != nil {
+			t.Fatalf("error getting entry with key of \"%s\": %v", key, err)
+		}
+
+		if e.Template != tc.newTemplate {
+			t.Fatalf("invalid value for template, expected \"%s\" and received \"%s\"", tc.newTemplate, e.Template)
 		}
 	}
 }
@@ -292,7 +362,7 @@ func TestPages_Remove(t *testing.T) {
 
 	for _, tc := range tcs {
 		if tc.key == "" {
-			if tc.key, err = p.New(tc.name, Data{"foo": "bar"}); err != nil {
+			if tc.key, err = p.New(tc.name, "template-1", Data{"foo": "bar"}); err != nil {
 				t.Fatal(err)
 			}
 
