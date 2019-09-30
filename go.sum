@@ -4,6 +4,8 @@ github.com/Hatch1fy/cron v0.0.0-20181011175651-1a19f6ee1f7c h1:eVU/3USbQIHqxUYcF
 github.com/Hatch1fy/cron v0.0.0-20181011175651-1a19f6ee1f7c/go.mod h1:PiW4gMHbJSJv2+jhZSMIL1kJQTWAFuPMu3CWfQbWmho=
 github.com/Hatch1fy/errors v0.0.0-20190124213112-81fd84668c75 h1:mdor7h+/JzGqDJXZESUD4B4FxwN85whEUrN7QA4Czk8=
 github.com/Hatch1fy/errors v0.0.0-20190124213112-81fd84668c75/go.mod h1:9/KQCSUklomtEqY0m9m/Ca10Y/rtOpu1x1/FVE6r8/8=
+github.com/Hatch1fy/httpserve v0.0.0-20190613164313-099d942969a2 h1:S/LzNlSyoEuGuF2VkVgTJqh1Ke6ziVMmEwMkTZeVaoI=
+github.com/Hatch1fy/httpserve v0.0.0-20190613164313-099d942969a2/go.mod h1:UD8KWs8jw185Et9Q2yXYbev5JG8/3s6wpC/mVihMlhU=
 github.com/Hatch1fy/logger v0.0.0-20190325014954-d19c6131e19c h1:Q1tp1cFNJNmnla/VXFWObcesGmDJRXEWzIcK5nNCdA8=
 github.com/Hatch1fy/logger v0.0.0-20190325014954-d19c6131e19c/go.mod h1:WR9unKTBHWeoWy9T+PTe9VruDMCpj2B/Lfu2yVzREqc=
 github.com/Hatch1fy/service-core v0.0.0-20190729223524-7d9870c60499 h1:6PLUH+TdnShIoLgfA5hmgCMr4WnCDH555MXnOpgTuEc=
@@ -14,6 +16,8 @@ github.com/PathDNA/atoms v0.0.0-20171213201720-7540df7fe84d h1:w43HzuI483b5oZ4n+
 github.com/PathDNA/atoms v0.0.0-20171213201720-7540df7fe84d/go.mod h1:IixvMnuDFymJzA4onVTRgK/Y4PzijliB1VmjbUtyA5I=
 github.com/boltdb/bolt v1.3.1 h1:JQmyP4ZBrce+ZQu0dY660FMfatumYDLun9hBCUVIkF4=
 github.com/boltdb/bolt v1.3.1/go.mod h1:clJnj/oiGkjum5o1McbSZDSLxVThjynRyGBgiAx27Ps=
+github.com/bradfitz/http2 v0.0.0-20160116213329-aa7658c0e990 h1:sdI+gcZTNTLDFsME4XQIxGj1jVH73kTBjWMVDIWI7fE=
+github.com/bradfitz/http2 v0.0.0-20160116213329-aa7658c0e990/go.mod h1:LnxXJOZZztMjXWVnF9iY8AOi0kGHs/uH7B+llP/6RMw=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/hatchify/output v0.0.0-20190621205759-4b3595c7a168 h1:+NrBPC+lPB/qkwhU1F2gnp5knPG1uwZrBn/E2lm3hHc=
